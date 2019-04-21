@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.user.dao.MenuDao">
+	<resultMap id="menuMap" type="com.interest.user.model.entity.MenuEntity">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="url" property="url" />
+		<result column="parent_id" property="parentId" />
+		<result column="sort" property="sort" />
+		<result column="remark" property="remark" />
+		<result column="icon" property="icon" />
+	</resultMap>
+
+	<resultMap id="menuVO" type="com.interest.user.model.response.MenuVO">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="url" property="url" />
+		<result column="parent_id" property="parentId" />
+		<result column="icon" property="icon" />
+	</resultMap>
+
+	<resultMap id="menuIdNameVO" type="com.interest.user.model.response.MenuIdNameVO">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+	</resultMap>
+
+	<select id="getMenuListById" resultMap="menuVO">
+		select id,name,url,parent_id,icon from menu
+		<where>
+			id in
+			<foreach collection="ids" item="item" index="index" open="("
+					 separator="," close=")">
+				#{item}
+			</foreach>
+		</where>
+		order by sort
+	</select>
+
+	<select id="getChildMenuListById" resultMap="menuVO">
+		select id,name,url,parent_id,icon from menu
+		<where>
+			parent_id > 0
+			and id in
+			<foreach collection="ids" item="item" index="index" open="("
+					 separator="," close=")">
+				#{item}
+			</foreach>
+		</where>
+		order by sort
+	</select>
+
+	<select id="getParentMenuListById" resultMap="menuVO">
+		select id,name,url,parent_id,icon from menu
+		<where>
+			parent_id = 0
+			and id in
+			<foreach collection="ids" item="item" index="index" open="("
+					 separator="," close=")">
+				#{item}
+			</foreach>
+		</where>
+		order by sort
+	</select>
+
+	<!-- 获取menu列表 -->
+	<select id="menusList" resultMap="menuMap">
+		select * from menu
+		<where>
+			<if test="menuId != null and menuId != ''">
+				id = #{menuId} or parent_id = #{menuId}
+			</if>
+		</where>
+		order by parent_id,id
+		<if test="pageSize != null and start != null ">
+			limit #{start},#{pageSize}
+		</if>
+	</select>
+	<!-- 获取user列表的总量 -->
+	<select id="menusSize" resultType="Integer">
+		select count(1) from menu
+		<where>
+			<if test="menuId != null and menuId != ''">
+				id = #{menuId} or parent_id = #{menuId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 通过parentId得到menus列表 -->
+	<select id="menusByParentId" resultMap="menuMap">
+		select * from menu
+		<where>
+			<if test="parentId != null">
+				parent_id = #{parentId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 新建用户信息 -->
+	<insert id="insertMenu" parameterType="MenuRequest">
+		insert into menu
+		(name,url,parent_id,sort,remark,icon)
+		values
+		(#{name},#{url},#{parentId},#{sort},#{remark},#{icon})
+	</insert>
+
+	<!-- 更新用户信息 -->
+	<update id="updateMenu" parameterType="MenuEntity">
+		update menu set
+		name = #{name},
+		url = #{url},
+		parent_id = #{parentId},
+		sort = #{sort},
+		remark = #{remark},
+		icon = #{icon}
+		<where>
+			id = #{id}
+		</where>
+	</update>
+	<!-- 删除用户信息 -->
+	<delete id="deleteMenus">
+		delete from menu
+		<where>
+			<if test="groupId !=null">
+				id in
+				<foreach collection="groupId" item="item" index="index"
+						 open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</delete>
+
+	<!-- 获取二级菜单 -->
+	<select id="getSubmenus" resultMap="menuIdNameVO">
+		select id,name from menu
+		<where>
+			parent_id > 0
+		</where>
+	</select>
+</mapper>

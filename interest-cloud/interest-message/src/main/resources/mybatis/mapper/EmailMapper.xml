@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.message.dao.EmailDao">
+    <resultMap id="emailMap" type="com.interest.message.model.entity.EmailEntity">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="email" property="email"/>
+        <result column="name" property="name"/>
+        <result column="content" property="content"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+
+    <resultMap id="emailVO" type="com.interest.message.model.response.EmailVO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="email" property="email"/>
+        <result column="name" property="name"/>
+        <result column="content" property="content"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+
+    <insert id="insertEntity" parameterType="EmailEntity">
+		insert into email(userid,title,email,name,content,createtime)
+		values (#{userid},#{title},#{email},#{name},#{content},#{createtime})
+	</insert>
+
+    <select id="getEmailsList" resultMap="emailVO">
+        select * from email
+        order by create_time desc
+        <if test="pageSize != null and start != null ">
+            limit #{start},#{pageSize}
+        </if>
+    </select>
+
+    <select id="getEmailsSize" resultType="Integer">
+        select count(1) from email
+	</select>
+
+    <delete id="deleteEmails">
+        delete from email
+        <where>
+            <if test="groupId !=null">
+                id in
+                <foreach collection="groupId" item="item" index="index"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+
+</mapper>

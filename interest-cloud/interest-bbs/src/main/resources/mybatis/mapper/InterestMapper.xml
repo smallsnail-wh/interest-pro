@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.bbs.dao.InterestDao">
+    <resultMap id="interestMap"
+               type="com.interest.bbs.model.entity.InterestEntity">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="info" property="info"/>
+        <result column="content" property="content"/>
+        <result column="image" property="image"/>
+        <result column="sort" property="sort"/>
+        <result column="banner" property="banner"/>
+    </resultMap>
+
+    <resultMap id="interestNoContentVO"
+               type="com.interest.bbs.model.response.InterestNoContentVO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="info" property="info"/>
+        <result column="image" property="image"/>
+        <result column="sort" property="sort"/>
+        <result column="banner" property="banner"/>
+    </resultMap>
+
+    <resultMap id="bannerVO"
+               type="com.interest.bbs.model.response.BannerVO">
+        <id column="id" property="id"/>
+        <result column="image" property="image"/>
+    </resultMap>
+
+    <resultMap id="interestOnlyTitleVO"
+               type="com.interest.bbs.model.response.InterestOnlyTitleVO">
+        <id column="id" property="id"/>
+        <result column="image" property="image"/>
+    </resultMap>
+
+    <select id="getBanners" resultMap="bannerVO">
+        select id,image from interest
+        <where>
+            banner = 1
+        </where>
+        <![CDATA[ order by sort desc ]]>
+    </select>
+
+    <select id="getInterest" resultMap="interestNoContentVO">
+        select id,title,image,info from interest
+        <where>
+            <if test="title != null and title != ''">
+                title like CONCAT('%',#{title},'%')
+            </if>
+        </where>
+        order by sort asc
+    </select>
+
+    <select id="getInterestById" resultMap="interestMap">
+        select * from interest
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <select id="getInterestsTitles" resultMap="interestOnlyTitleVO">
+        select id,title from interest
+    </select>
+
+    <insert id="insertEntity" parameterType="InterestRequest">
+		insert into interest (title,info,content,image)
+	  	values (#{title},#{info},#{content},#{image})
+	</insert>
+
+    <update id="updateEntity" parameterType="InterestUpdateRequest">
+        update interest set title = #{title},info = #{info},content = #{content},image = #{image},sort = #{sort}
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <select id="interestList" resultMap="interestNoContentVO">
+        select id,title,info,sort,banner from interest
+        order by sort asc
+        <if test="pageSize != null and start != null ">
+            limit #{start},#{pageSize}
+        </if>
+    </select>
+
+    <select id="interestSize" resultType="Integer">
+		select count(1) from interest
+	</select>
+
+    <delete id="deleteInterests">
+        delete from interest
+        <where>
+            <if test="groupId !=null">
+                id in
+                <foreach collection="groupId" item="item" index="index"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+
+    <update id="updateBanners">
+        update interest set banner = #{banner}
+        <where>
+            <if test="groupId !=null">
+                id in
+                <foreach collection="groupId" item="item" index="index"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </update>
+
+</mapper>

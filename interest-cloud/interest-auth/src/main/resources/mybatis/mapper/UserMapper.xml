@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.auth.dao.UserDao">
+    <resultMap id="userMap" type="com.interest.auth.model.entity.UserEntity">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="login_name" property="loginName"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="headimg" property="headimg"/>
+        <result column="url" property="url"/>
+        <result column="create_time" property="createTime"/>
+        <result column="githubid" property="githubid"/>
+        <result column="qqid" property="qqid"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <select id="getUserEntityById" resultMap="userMap">
+        SELECT * FROM user
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <select id="getUserEntityByLoginName" resultMap="userMap">
+        select * from user
+        <where>
+            login_name = #{loginName}
+        </where>
+    </select>
+
+    <select id="getEntityByGithubId" resultMap="userMap">
+        select * from user
+        <where>
+            githubid = #{githubId}
+        </where>
+    </select>
+
+    <!-- 新建用户信息 -->
+    <insert id="insertUser" parameterType="UserEntity">
+        <selectKey keyProperty="id" resultType="java.lang.Integer"
+                   order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into user (name,email,headimg,url,create_time,githubid)
+        values
+        (#{name},#{email},#{headimg},#{url},#{createTime},#{githubid})
+    </insert>
+
+    <update id="updateHeadImg">
+        update user set headimg = #{headImg}
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <select id="getEntityByQqid" resultMap="userMap">
+        select * from user
+        <where>
+            qqid = #{qqid}
+        </where>
+    </select>
+
+    <insert id="insertUserByQq" parameterType="UserEntity">
+        <selectKey keyProperty="id" resultType="java.lang.Integer"
+                   order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into user (name,headimg,create_time,qqid)
+        values
+        (#{name},#{headimg},#{createTime},#{qqid})
+    </insert>
+
+</mapper>

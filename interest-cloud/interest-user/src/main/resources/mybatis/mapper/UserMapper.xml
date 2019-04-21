@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.user.dao.UserDao">
+    <resultMap id="userMap" type="com.interest.user.model.entity.UserEntity">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="login_name" property="loginName"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="headimg" property="headimg"/>
+        <result column="url" property="url"/>
+        <result column="create_time" property="createTime"/>
+        <result column="githubid" property="githubid"/>
+        <result column="qqid" property="qqid"/>
+        <result column="type" property="type"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <resultMap id="userVO" type="com.interest.user.model.response.UserVO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="login_name" property="loginName"/>
+        <result column="email" property="email"/>
+        <result column="headimg" property="headimg"/>
+        <result column="url" property="url"/>
+        <result column="create_time" property="createTime"/>
+        <result column="githubid" property="githubid"/>
+        <result column="qqid" property="qqid"/>
+        <result column="type" property="type"/>
+    </resultMap>
+
+    <resultMap id="userBaseInfoVO" type="com.interest.user.model.response.UserBaseInfoVO">
+        <result column="name" property="name"/>
+        <result column="email" property="email"/>
+        <result column="headimg" property="headimg"/>
+        <result column="url" property="url"/>
+    </resultMap>
+
+    <resultMap id="userHeadInfoVO" type="com.interest.common.model.response.UserHeadInfoVO">
+        <result column="userId" property="userId"/>
+        <result column="headImg" property="headImg"/>
+        <result column="userName" property="userName"/>
+    </resultMap>
+
+    <resultMap id="userInfoVO" type="com.interest.user.model.response.UserInfoVO">
+        <id column="headimg" property="headimg"/>
+        <result column="name" property="name"/>
+        <result column="url" property="url"/>
+        <result column="email" property="email"/>
+        <result column="info" property="info"/>
+        <result column="location" property="location"/>
+        <result column="skill" property="skill"/>
+    </resultMap>
+
+    <select id="getUserBaseInfoById" resultMap="userBaseInfoVO">
+        SELECT name,email,headimg,url FROM user
+        <where>
+          id = #{id}
+        </where>
+    </select>
+
+    <select id="getUsersHeadInfoByIds" resultMap="userHeadInfoVO">
+        SELECT id userId,headimg headImg,name userName
+        FROM user
+        <where>
+            id IN
+            <foreach collection="ids" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </where>
+    </select>
+
+    <select id="getUsersHeadInfoById" resultMap="userHeadInfoVO">
+        SELECT id userId,headimg headImg,name userName
+        FROM user
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <select id="getUserInfoById" resultMap="userInfoVO">
+        select a.headimg,a.name,a.email,a.url,b.info,b.location,b.skill
+        from user a
+        left join user_detail b on a.id = b.userid
+        <where>
+            a.id = #{userId}
+        </where>
+    </select>
+
+    <update id="updateUserInfo">
+        update user set name = #{name},url = #{url},email = #{email}
+        <where>
+            id = #{userId}
+        </where>
+    </update>
+
+    <select id="getUserEntityById" resultMap="userMap">
+        SELECT * FROM user
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <update id="updateHeadImg">
+        update user set headimg = #{headImg}
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <!-- 获取user列表 -->
+    <select id="getUsersList" resultMap="userVO">
+        select id,name,login_name,email,headimg,url,create_time,githubid,qqid,type
+        from user
+        <where>
+            status = #{status} and type = #{type}
+            <if test="name != null and name != ''">
+                and name like CONCAT('%',#{name},'%')
+            </if>
+            <if test="userId != null and userId != ''">
+                and id = #{userId}
+            </if>
+        </where>
+        order by id desc
+        <if test="pageSize != null and start != null ">
+            limit #{start},#{pageSize}
+        </if>
+    </select>
+    <!-- 获取user列表的总量 -->
+    <select id="getUsersSize" resultType="Integer">
+        select count(*) from user
+        <where>
+            status = #{status} and type = #{type}
+            <if test="name != null and name != ''">
+                and name like CONCAT('%',#{name},'%')
+            </if>
+            <if test="userId != null and userId != ''">
+                and id = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateUsersStatus">
+         update user set status = #{status}
+        <where>
+            <if test="groupId !=null">
+                id in
+                <foreach collection="groupId" item="item" index="index"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </update>
+
+    <insert id="insertSystemUser" parameterType="UserEntity">
+        <selectKey keyProperty="id" resultType="java.lang.Integer"
+                   order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into user (name,login_name,password,create_time,type)
+        values
+        (#{name},#{loginName},#{password},#{createTime},#{type})
+    </insert>
+
+    <update id="updateSystemUser" parameterType="UserEntity">
+        update user set
+        name = #{name},
+        login_name = #{loginName},
+        password = #{password}
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+</mapper>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.bbs.dao.PostCardDao">
+	<resultMap id="postCardMap"
+		type="com.interest.bbs.model.entity.PostCardEntity">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="interest_id" property="interestId" />
+		<result column="create_time" property="createTime" />
+		<result column="reply_time" property="replyTime" />
+		<result column="user_id" property="userId" />
+	</resultMap>
+
+	<resultMap id="postCardModelMap"
+			   type="com.interest.bbs.model.response.PostCardVO">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="reply_time" property="replyTime" />
+		<result column="user_id" property="userId" />
+		<association property="replyCount" column="id" select="com.interest.bbs.dao.ReplyCardDao.replyCardCountByPostId"/>
+	</resultMap>
+
+	<resultMap id="postCardInfoVO"
+			   type="com.interest.bbs.model.response.PostCardInfoVO">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="create_time" property="createTime" />
+		<result column="user_id" property="userId" />
+	</resultMap>
+
+	<resultMap id="postCardNoUserVO"
+			   type="com.interest.bbs.model.response.PostCardNoUserVO">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="interest_id" property="interestId" />
+		<result column="create_time" property="createTime" />
+		<result column="reply_time" property="replyTime" />
+		<result column="user_id" property="userId" />
+	</resultMap>
+
+	<select id="postcardList" resultMap="postCardModelMap">
+		select id,title,content,reply_time,user_id
+		from post_card
+		<where>
+			<if test="interestId != null and interestId != ''">
+				interest_id = #{interestId}
+			</if>
+		</where>
+		order by reply_time desc
+		limit #{start},#{pageSize}
+	</select>
+
+	<select id="postcardSize" resultType="Integer">
+		select count(*) from post_card
+		<where>
+			<if test="interestId != null and interestId != ''">
+				interest_id = #{interestId}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertEntity" parameterType="PostCardEntity">
+		insert into post_card (user_id,title,content,interest_id,create_time,reply_time)
+		values (#{userId},#{title},#{content},#{interestId},#{createTime},#{replyTime})
+	</insert>
+
+	<select id="getPostcard" resultMap ="postCardInfoVO">
+		select id,title,content,create_time,user_id
+		from post_card a
+		<where>
+			id = #{id}
+		</where>
+	</select>
+
+	<update id="updateReplyTime">
+		update post_card set reply_time = #{replyTime}
+		<where>
+			id = #{id}
+		</where>
+	</update>
+
+	<select id="getPostcardsNoUserList" resultMap="postCardNoUserVO">
+		select *
+		from post_card
+		<where>
+			<if test="interestId != null and interestId != ''">
+				interest_id = #{interestId}
+			</if>
+		</where>
+		order by reply_time desc
+		limit #{start},#{pageSize}
+	</select>
+
+	<select id="getPostcardsNoUserSize" resultType="Integer">
+		select count(*) from post_card
+		<where>
+			<if test="interestId != null and interestId != ''">
+				interest_id = #{interestId}
+			</if>
+		</where>
+	</select>
+
+	<delete id="deletePostcards">
+		delete from post_card
+		<where>
+			<if test="groupId !=null">
+				id in
+				<foreach collection="groupId" item="item" index="index"
+						 open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</delete>
+
+</mapper>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.user.dao.UserQQDao">
+	<resultMap id="qqUserMap" type="com.interest.user.model.entity.UserQQEntity">
+		<id column="openid" property="openid" />
+		<result column="nickname" property="nickname" />
+		<result column="figureurl_qq_1" property="figureurlQq1" />
+		<result column="gender" property="gender" />
+		<result column="userid" property="userid" />
+	</resultMap>
+
+
+</mapper>

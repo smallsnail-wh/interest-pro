@@ -1,0 +1,57 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /interest/user
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+spring:
+  application:
+      name: interest-user
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/interest_user?useUnicode=true&characterEncoding=UTF-8&useSSL=false&jdbcCompliantTruncation=false&zeroDateTimeBehavior=convertToNull
+    username: root
+    password:
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      connection-test-query: SELECT 1
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      pool-name: DatebookHikariCP
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password: null
+    timeout: 5000ms
+    jedis:
+      pool:
+        max-active: 100
+        max-idle: 10
+        max-wait: 100000ms
+logging:
+# 你需要存储日志的目录
+  file: D:/interest/file/log/interest.log
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    com.interest.auth: DEBUG
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-aliases-package: com.interest.user.model
+#自定义配置
+interest:
+  paths-properties:
+    image: D:/interest/file/image
+#    image: 你需要存储图片的目录，如上
+    domain-name: http://127.0.0.1:8080
+#   domain-name: https://www.lovemtt.com
+#   domain-name: 你的域名或者（ip+端口），如上
+  github:
+    client-id: 你在github中注册的client id
+    client-secret: 你在github中注册的client secret
+  qq:
+    appid: 你在qq中注册的appid
+    appkey: 你在qq中注册的appkey

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.bbs.dao.ReplyCardDao">
+	<resultMap id="replyCardMap"
+		type="com.interest.bbs.model.entity.ReplyCardEntity">
+		<id column="id" property="id" />
+		<result column="user_id" property="userid" />
+		<result column="content" property="content" />
+		<result column="post_card_id" property="postCardId" />
+		<result column="create_time" property="createTime" />
+	</resultMap>
+
+	<resultMap id="replyCardModelMap"
+			   type="com.interest.bbs.model.response.ReplyCardVO">
+		<result column="content" property="content" />
+		<result column="create_time" property="createTime" />
+		<result column="user_id" property="userId" />
+	</resultMap>
+
+	<resultMap id="msgContentVO"
+			   type="com.interest.common.model.response.MsgContentVO">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="replyContent" property="replyContent" />
+		<result column="toId" property="toId" />
+		<result column="replyUserId" property="replyUserId" />
+	</resultMap>
+
+	<select id="replyCardCountByPostId" resultType="Integer">
+		select count(1) from reply_card
+		<where>
+			post_card_id = #{postCardId}
+		</where>
+	</select>
+
+	<select id="replyCardList" resultMap="replyCardModelMap">
+		select content,create_time,user_id
+		from reply_card
+		<where>
+			post_card_id = #{postCardId}
+		</where>
+		order by create_time asc
+		<if test="pageSize != null and start != null ">
+			limit #{start},#{pageSize}
+		</if>
+	</select>
+
+	<select id="replyCardSize" resultType="Integer">
+		select count(1) from reply_card
+		<where>
+			post_card_id = #{postCardId}
+		</where>
+	</select>
+
+	<insert id="insertEntity" parameterType="ReplyCardEntity">
+		<selectKey keyProperty="id" resultType="java.lang.Integer"
+				   order="AFTER">
+			select LAST_INSERT_ID()
+		</selectKey>
+		insert into reply_card (user_id,content,post_card_id,create_time)
+		values (#{userId},#{content},#{postCardId},#{createTime})
+	</insert>
+
+	<select id="getMsgContentByIds" resultMap="msgContentVO">
+		select a.id,a.content replyContent,a.user_id replyUserId,b.title title,b.id toId
+        from reply_card a
+        left join post_card b on a.post_card_id = b.id
+        <where>
+			a.id in
+			<foreach collection="ids" item="item" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</where>
+	</select>
+
+	<delete id="delReplyByPostcardId">
+		delete from reply_card
+		<where>
+			<if test="postcardIds !=null">
+				post_card_id in
+				<foreach collection="postcardIds" item="item" index="index"
+						 open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</delete>
+
+</mapper>

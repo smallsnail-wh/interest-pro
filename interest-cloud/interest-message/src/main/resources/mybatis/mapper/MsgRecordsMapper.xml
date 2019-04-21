@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.message.dao.MsgRecordsDao">
+    <resultMap id="msgRecordMap"
+               type="com.interest.message.model.entity.MsgRecordEntity">
+        <id column="id" property="id"/>
+        <result column="owner_id" property="ownerId"/>
+        <result column="reply_card_id" property="replyCardId"/>
+        <result column="reply_time" property="replyTime"/>
+        <result column="is_read" property="isRead"/>
+        <result column="form" property="form"/>
+        <result column="comment_id" property="commentId"/>
+    </resultMap>
+
+    <resultMap id="msgRecordVO"
+               type="com.interest.message.model.response.MsgRecordVO">
+        <id column="id" property="id"/>
+        <result column="owner_id" property="ownerId"/>
+        <result column="form" property="form"/>
+        <result column="reply_card_id" property="replyCardId"/>
+        <result column="comment_id" property="commentId"/>
+        <result column="reply_time" property="replyTime"/>
+        <result column="is_read" property="isRead"/>
+        <result column="replyUserId" property="replyUserId"/>
+        <result column="replyUserHeadImg" property="replyUserHeadImg"/>
+        <result column="replyUsername" property="replyUsername"/>
+        <result column="replyContent" property="replyContent"/>
+        <result column="title" property="title"/>
+        <result column="toId" property="toId"/>
+    </resultMap>
+
+    <select id="getUnreadMsgCount" parameterType="Integer" resultType="Integer">
+        select count(1) from msg_records
+        <where>
+            owner_id = #{userId} and is_read = 0
+        </where>
+    </select>
+
+    <insert id="addMsg" parameterType="MsgRecordEntity">
+		insert into msg_records(owner_id, form, comment_id, reply_card_id, reply_time, is_read)
+			values(#{ownerId}, #{form}, #{commentId}, #{replyCardId}, #{replyTime}, #{isRead});
+	</insert>
+
+    <select id="getMsgListByUserId" resultMap="msgRecordVO">
+        select *
+        from msg_records
+        <where>
+            owner_id = #{userId}
+        </where>
+        order by reply_time desc
+        limit #{start},#{pageSize}
+    </select>
+
+    <select id="getMsgSizeByUserId" resultType="Integer">
+        select count(1) from msg_records
+        <where>
+            owner_id = #{userId}
+        </where>
+    </select>
+
+    <update id="updateMsgRecordIsRead">
+        update msg_records set is_read = #{readSign}
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+</mapper>

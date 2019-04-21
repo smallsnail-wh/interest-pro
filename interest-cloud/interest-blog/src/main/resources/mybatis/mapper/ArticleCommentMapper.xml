@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.blog.dao.ArticleCommentDao">
+    <resultMap id="articleCommentEntity" type="com.interest.blog.model.entity.ArticleCommentEntity">
+        <id column="id" property="id"/>
+        <result column="article_id" property="articleId"/>
+        <result column="user_id" property="userId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="comment" property="comment"/>
+        <result column="create_time" property="createTime"/>
+        <result column="replier_id" property="replierId"/>
+        <result column="replier_name" property="replierName"/>
+    </resultMap>
+
+    <resultMap id="articleCommentVO" type="com.interest.blog.model.response.ArticleCommentVO">
+        <id column="id" property="id"/>
+        <result column="article_id" property="articleId"/>
+        <result column="user_id" property="userId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="comment" property="comment"/>
+        <result column="create_time" property="createTime"/>
+        <result column="replier_id" property="replierId"/>
+        <result column="replier_name" property="replierName"/>
+        <result column="userName" property="userName"/>
+        <result column="userHeadImg" property="userHeadImg"/>
+        <collection property="childComments" column="{parentId = id}"
+                    select="com.interest.blog.dao.ArticleCommentDao.getChildCommentsById"/>
+    </resultMap>
+
+    <resultMap id="articleReplyCommentVO" type="com.interest.blog.model.response.ArticleReplyCommentVO">
+        <id column="id" property="id"/>
+        <result column="article_id" property="articleId"/>
+        <result column="user_id" property="userId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="comment" property="comment"/>
+        <result column="create_time" property="createTime"/>
+        <result column="replier_id" property="replierId"/>
+        <result column="replier_name" property="replierName"/>
+        <result column="userName" property="userName"/>
+        <result column="userHeadImg" property="userHeadImg"/>
+    </resultMap>
+
+    <resultMap id="msgContentVO"
+               type="com.interest.common.model.response.MsgContentVO">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="replyContent" property="replyContent" />
+        <result column="toId" property="toId" />
+        <result column="replyUserId" property="replyUserId" />
+    </resultMap>
+
+    <insert id="insertEntity" parameterType="ArticleCommentEntity">
+        <selectKey keyProperty="id" resultType="java.lang.Integer"
+                   order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into article_comment (article_id,user_id,parent_id,comment,create_time,replier_id,replier_name)
+        values (#{articleId},#{userId},#{parentId},#{comment},#{createTime},#{replierId},#{replierName})
+    </insert>
+
+    <select id="getArticleCommentByArticleId" resultMap="articleCommentVO">
+        select *
+        from article_comment
+        <where>
+            article_id = #{articleId} and parent_id is null
+        </where>
+        order by create_time desc
+        limit #{pageWrapper.start},#{pageWrapper.pageSize}
+    </select>
+
+    <select id="getChildCommentsById" resultMap="articleReplyCommentVO">
+        select *
+        from article_comment
+        <where>
+            parent_id = #{parentId}
+        </where>
+        order by create_time asc
+    </select>
+
+    <select id="getArticleCommentSizeByArticleId" resultType="Integer">
+        select count(1) from article_comment
+        <where>
+            article_id = #{articleId} and parent_id is null
+        </where>
+    </select>
+
+    <select id="getMsgContentByIds" resultMap="msgContentVO">
+        select a.id,a.comment replyContent,a.user_id replyUserId,b.title title,b.id toId
+        from article_comment a
+        left join article b on a.article_id = b.id
+        <where>
+            a.id in
+            <foreach collection="ids" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </where>
+    </select>
+
+</mapper>

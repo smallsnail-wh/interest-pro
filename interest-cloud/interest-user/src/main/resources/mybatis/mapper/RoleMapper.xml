@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.user.dao.RoleDao">
+	<resultMap id="roleMap" type="com.interest.user.model.entity.RoleEntity">
+		<id column="id" property="id" />
+		<result column="role" property="role" />
+		<result column="name" property="name" />
+		<result column="modules" property="modules" />
+		<result column="describe" property="describe" />
+	</resultMap>
+
+	<resultMap id="roleVO" type="com.interest.user.model.response.RoleVO">
+		<id column="id" property="id" />
+		<result column="role" property="role" />
+		<result column="name" property="name" />
+		<result column="describe" property="describe" />
+	</resultMap>
+
+	<!-- 通过id得到Modules集合 -->
+	<select id="getModulesById" resultType="String">
+		select modules from role
+		<where>
+			id in (select role_id from r_user_role where user_id = #{userId})
+		</where>
+	</select>
+
+	<!-- 得到角色全部数据 -->
+	<select id="allRoles" resultMap="roleVO">
+		select id,role,name,`describe` from role
+	</select>
+
+	<!-- 获取role列表 -->
+	<select id="rolesList" resultMap="roleMap">
+		select * from role
+		order by id
+		<if test="pageSize != null and start != null ">
+			limit #{start},#{pageSize}
+		</if>
+	</select>
+	<!-- 获取role列表的总量 -->
+	<select id="rolesSize" resultType="Integer">
+	    select count(1) from role
+	</select>
+
+	<!-- 新建角色信息 -->
+	<insert id="insertRole" parameterType="RoleEntity">
+		insert into role (role,name,modules,`describe`)
+		values
+		(#{role},#{name},#{modules},#{describe})
+	</insert>
+	<!-- 更新角色信息 -->
+	<update id="updateRole" parameterType="RoleEntity">
+		update role set
+		role = #{role},
+		name = #{name},
+		modules = #{modules},
+		`describe` = #{describe}
+		<where>
+			id = #{id}
+		</where>
+	</update>
+	<!-- 删除角色信息 -->
+	<delete id="deleteRoles">
+		delete from role
+		<where>
+			<if test="groupId !=null">
+				id in
+				<foreach collection="groupId" item="item" index="index"
+						 open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</delete>
+
+</mapper>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.blog.dao.ArticleDao">
+    <resultMap id="articleMap" type="com.interest.blog.model.entity.ArticleEntity">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="info" property="info"/>
+        <result column="content" property="content"/>
+        <result column="click_rate" property="clickRate"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="top" property="top"/>
+        <result column="create_time" property="createTime"/>
+        <result column="reply_time" property="replyTime"/>
+        <result column="user_Id" property="userId"/>
+        <result column="del" property="del"/>
+    </resultMap>
+
+    <resultMap id="articleVO" type="com.interest.blog.model.response.ArticleVO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="info" property="info"/>
+        <result column="click_rate" property="clickRate"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="top" property="top"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+
+    <resultMap id="articleDetailVO" type="com.interest.blog.model.response.ArticleDetailVO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="click_rate" property="clickRate"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="top" property="top"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_id" property="userId"/>
+        <result column="userName" property="userName"/>
+        <result column="userHeadImg" property="userHeadImg"/>
+    </resultMap>
+
+    <select id="getArticleList" resultMap="articleVO">
+        select id,title,info,click_rate,comment_count,create_time,user_id,top
+        from article
+        <where>
+            <if test="searchContent != '' and searchContent != null">
+                (title like CONCAT('%',#{searchContent},'%') or
+                info like CONCAT('%',#{searchContent},'%')) and
+            </if>
+            del = 0
+        </where>
+        order by top desc, reply_time desc
+        limit #{pageWrapper.start},#{pageWrapper.pageSize}
+    </select>
+
+    <select id="getArticleSize" resultType="Integer">
+        select count(1) from article
+        <where>
+            <if test="searchContent != '' and searchContent != null">
+                (title like CONCAT('%',#{searchContent},'%') or
+                info like CONCAT('%',#{searchContent},'%')) and
+            </if>
+            del = 0
+        </where>
+    </select>
+
+    <update id="addClickRateById">
+        update article set click_rate = click_rate + ${number}
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <update id="addCommentCountById">
+        update article set comment_count = comment_count + ${number}
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <insert id="insertArticle" parameterType="ArticleEntity">
+        insert into article(title,info,content,create_time,reply_time,user_id)
+        values (#{title},#{info},#{content},#{createTime},#{replyTime},#{userId})
+    </insert>
+
+    <select id="getArticleById" resultMap="articleDetailVO">
+        select id,title,content,click_rate,comment_count,create_time,user_id
+        from article
+        <where>
+            id = #{id} and del = 0
+        </where>
+    </select>
+
+    <select id="getArticlesListByUserId" resultMap="articleVO">
+        select id,title,info,click_rate,comment_count,create_time,user_id,top
+        from article
+        <where>
+            user_id = #{userId} and del = 0
+        </where>
+        order by top desc, reply_time desc
+        limit #{pageWrapper.start},#{pageWrapper.pageSize}
+    </select>
+
+    <select id="getArticlesSizeByUserId" resultType="Integer">
+        select count(1) from article
+        <where>
+            user_id = #{userId} and del = 0
+        </where>
+    </select>
+
+    <update id="updateArticlesDelByIdAndUserId">
+        update article set del = 1
+        <where>
+            user_id = #{userId} and id = #{articleId}
+        </where>
+    </update>
+
+    <update id="updateArticle" parameterType="ArticleEntity">
+        update article set title = #{title}, info = #{info}, content = #{content}
+        <where>
+            id = #{id} and user_id = #{userId}
+        </where>
+    </update>
+
+    <select id="getArticleListOnManagement" resultMap="articleVO">
+        select id,title,info,click_rate,comment_count,create_time,user_id,top
+        from article
+        <where>
+            <if test="searchContent != '' and searchContent != null">
+                (title like CONCAT('%',#{searchContent},'%') or
+                info like CONCAT('%',#{searchContent},'%')) and
+            </if>
+            del = #{del}
+            <if test="dayStart != '' and dayStart != null and dayEnd != '' and dayEnd != null">
+                and create_time >= #{dayStart} and create_time &lt;= #{dayEnd}
+            </if>
+        </where>
+        order by top desc,create_time desc
+        limit #{pageWrapper.start},#{pageWrapper.pageSize}
+    </select>
+
+    <select id="getArticleSizeOnManagement" resultType="Integer">
+        select count(1) from article
+        <where>
+            <if test="searchContent != '' and searchContent != null">
+                (title like CONCAT('%',#{searchContent},'%') or
+                info like CONCAT('%',#{searchContent},'%')) and
+            </if>
+            del = #{del}
+            <if test="dayStart != '' and dayStart != null and dayEnd != '' and dayEnd != null">
+                and create_time >= #{dayStart} and create_time &lt;= #{dayEnd}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateArticlesDelByIds">
+        update article set del = #{del}
+        <where>
+            <if test="groupId !=null">
+                id in
+                <foreach collection="groupId" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </update>
+
+    <update id="updateArticlesTopByIds">
+        update article set top = #{top}
+        <where>
+            <if test="groupId !=null">
+                id in
+                <foreach collection="groupId" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </update>
+
+</mapper>

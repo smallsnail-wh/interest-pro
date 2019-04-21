@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.interest.auth.dao.RoleDao">
+	<resultMap id="roleMap" type="com.interest.auth.model.entity.RoleEntity">
+		<id column="id" property="id" />
+		<result column="role" property="role" />
+		<result column="name" property="name" />
+		<result column="modules" property="modules" />
+		<result column="describe" property="describe" />
+	</resultMap>
+	<!-- 通过UserId得到对应的role -->
+	<select id="getRolesByUserId" resultType="String">
+		select `role` from
+		role where id in (select role_id from r_user_role where user_id =
+		#{userId})
+	</select>
+</mapper>
