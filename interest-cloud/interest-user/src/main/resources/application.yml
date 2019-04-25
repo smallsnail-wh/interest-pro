@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8083
   servlet:
     context-path: /interest/user
 eureka:
@@ -41,7 +41,7 @@ logging:
   level:
     org.springframework.web: DEBUG
     org.springframework.security: DEBUG
-    com.interest.auth: DEBUG
+    com.interest.user: DEBUG
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml
   type-aliases-package: com.interest.user.model

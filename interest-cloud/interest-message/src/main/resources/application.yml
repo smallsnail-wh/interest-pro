@@ -41,7 +41,10 @@ logging:
   level:
     org.springframework.web: DEBUG
     org.springframework.security: DEBUG
-    com.interest.auth: DEBUG
+    com.interest.message: DEBUG
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml
-  type-aliases-package: com.interest.bbs.model
+  type-aliases-package: com.interest.message.model
+ribbon:
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
