@@ -10,9 +10,9 @@ spring:
   application:
       name: interest-user
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/interest_user?useUnicode=true&characterEncoding=UTF-8&useSSL=false&jdbcCompliantTruncation=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://127.0.0.1:3306/interest_user?useUnicode=true&createDatabaseIfNotExist=true&characterEncoding=UTF-8&useSSL=false&jdbcCompliantTruncation=false&zeroDateTimeBehavior=convertToNull
     username: root
-    password:
+    password: wanghuan
     hikari:
       minimum-idle: 5
       maximum-pool-size: 15
@@ -31,6 +31,10 @@ spring:
         max-active: 100
         max-idle: 10
         max-wait: 100000ms
+  liquibase:
+    change-log: classpath:database/master.xml
+    enabled: true
+    drop-first: false
 logging:
 # 你需要存储日志的目录
   file: D:/interest/file/log/interest.log
@@ -41,17 +45,3 @@ logging:
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml
   type-aliases-package: com.interest.user.model
-#自定义配置
-interest:
-  paths-properties:
-    image: D:/interest/file/image
-#    image: 你需要存储图片的目录，如上
-    domain-name: http://127.0.0.1:8080
-#   domain-name: https://www.lovemtt.com
-#   domain-name: 你的域名或者（ip+端口），如上
-  github:
-    client-id: 你在github中注册的client id
-    client-secret: 你在github中注册的client secret
-  qq:
-    appid: 你在qq中注册的appid
-    appkey: 你在qq中注册的appkey
