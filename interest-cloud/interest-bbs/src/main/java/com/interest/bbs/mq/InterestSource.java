@@ -1,6 +1,5 @@
-package com.interest.message.kafka;
+package com.interest.bbs.mq;
 
-import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.messaging.MessageChannel;
 

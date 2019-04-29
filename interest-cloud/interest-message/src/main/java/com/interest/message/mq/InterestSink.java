@@ -1,4 +1,4 @@
-package com.interest.message.kafka;
+package com.interest.message.mq;
 
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.messaging.SubscribableChannel;
