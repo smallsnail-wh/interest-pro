@@ -1,6 +1,8 @@
 # interest-pro
 interest项目的微服务版
 
+当master分支代码为含有kafka版本，需要无kafka版本代码，下载tag 1.0.0 版本代码。
+
 ## 项目介绍
   该项目为前后端分离项目，前端vue，后端Spring Cloud。
   
