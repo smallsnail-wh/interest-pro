@@ -54,6 +54,7 @@ spring clound项目,前端项目[interest-web](https://github.com/smallsnail-wh/
  - interest_bbs bbs表
  - interest_blog blog表
  - interest_message 消息表
+ 
  使用mysql（用户密码为BCrypt加密，用户admin的密码为admin）
 
 ## 项目搭建
