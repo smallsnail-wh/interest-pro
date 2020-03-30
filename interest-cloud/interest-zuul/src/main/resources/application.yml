@@ -15,22 +15,27 @@ zuul:
   sensitive-headers:
   routes:
     auth:
+      url: http://127.0.0.1:8082
       path: /interest/auth/**
       serviceId: interest-auth
       stripPrefix: false
     user:
+      url: http://127.0.0.1:8083
       path: /interest/user/**
       serviceId: interest-user
       stripPrefix: false
     bbs:
+      url: http://127.0.0.1:8084
       path: /interest/bbs/**
       serviceId: interest-bbs
       stripPrefix: false
     blog:
+      url: http://127.0.0.1:8086
       path: /interest/blog/**
       serviceId: interest-blog
       stripPrefix: false
     message:
+      url: http://127.0.0.1:8085
       path: /interest/message/**
       serviceId: interest-message
       stripPrefix: false
